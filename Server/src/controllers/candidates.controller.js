@@ -1,5 +1,9 @@
 const db = require('../database/models');
 const Op = db.Sequelize.Op;
+const candidateService = require('../services/candidate.service.js');
+const professionService = require('../services/profession.service.js');
+const socialNetworkService = require('../services/socialNetwork.service.js');
+
 const candidatesController = {};
 
 /**
@@ -81,54 +85,32 @@ candidatesController.detail = async (req, res) => {
  * Crear un nuevo Aspirante
  */
 candidatesController.create = async (req, res) => {
-    // Creamos constantes usando la desestructuración
+    // Creamos los campos necesarios usando la desestructuración
     const { dni, name, surname, email, phone, birthday, gender, image } = req.body;
-    const { professions, linkedin } = req.body;
-
-    // Verificamos que todos los campos esten completos
-    if (!dni || !name || !surname || !email || !birthday || !gender || !image || !professions || !Array.isArray(professions) || professions.length === 0 || !linkedin) {
-        return res.status(400).json({
-            status: 400,
-            message: 'Todos los campos son requeridos',
-            data: []
-        })
-    }
+    const { professions, socialNetworks } = req.body;
 
     try {
-        // Creamos y guardamos el nuevo Aspirante en la base de datos
-        const candidateCreated = await db.Candidate.create({
-            dni,
-            name,
-            surname,
-            email,
-            phone: phone || null,
-            birthday,
-            gender,
-            image
-        });
+        // Creamos un nuevo aspirante en la base de datos
+        const createdCandidate = await candidateService.createCandidate({
+            dni, name, surname, email, phone, birthday, gender, image
+        })
 
-        // Creamos un array de objetos de profesiones con los campos necesarios
-        // filtrando aquellos que tengan un nombre de profesión no nula por seguridad
-        const professionsToCreate = professions.map(item => {
-            const newProfession = {
-                profession: item.profession ? item.profession : null,
-                candidate_id: candidateCreated.id
-            }
-            return newProfession;
-        }).filter(item => item.profession !== null)
+        // Creamos las profesiones del aspirante
+        await professionService.createProfessions({
+            professions: professions, candidate_id: createdCandidate.id
+        })
 
-        // Guardamos varios objetos de profesiones en la base de datos con bulkCreate
-        await db.Profession.bulkCreate(professionsToCreate);
-
-        // Guardamos los atributos a la tabla de redes sociales
-        await db.SocialNetwork.create({
-            linkedin,
-            candidate_id: candidateCreated.id
-        });
+        // Creamos las redes sociales del aspirante
+        await socialNetworkService.createSocialNetworks({
+            socialNetworks: socialNetworks, candidate_id: createdCandidate.id
+        })
 
         // Buscamos el Aspirante en la base de datos por su id
-        const candidateFound = await db.Candidate.findByPk(candidateCreated.id, {
-            include: [{ association: "professions" }, { association: "social_networks" }]
+        const candidateFound = await db.Candidate.findByPk(createdCandidate.id, {
+            include: [
+                { association: "professions" },
+                { association: "social_networks" }
+            ]
         });
 
         // Retornamos la response 201 creado
