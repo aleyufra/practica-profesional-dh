@@ -1,29 +1,62 @@
 const db = require('../database/models');
 const socialNetworkService = {};
 
-socialNetworkService.createSocialNetworks = async (object) => {
+socialNetworkService.create = async (object) => {
     return new Promise(async (resolve, reject) => {
         try {
             // extraemos los campos del objeto con desestructuración
-            const { socialNetworks, candidate_id } = object;
+            const { socialNetworks = {}, candidate_id } = object;
             const { linkedin, facebook, twitter, instagram } = socialNetworks;
-            
-            // creamos un objeto con los campos extraidos que existan
-            let socialNetworksFields = { candidate_id: candidate_id };
-            if (linkedin) socialNetworksFields.linkedin = linkedin;
-            if (facebook) socialNetworksFields.facebook = facebook;
-            if (twitter) socialNetworksFields.twitter = twitter;
-            if (instagram) socialNetworksFields.instagram = instagram;
 
-            // creamos el candidato con los campos extraidos y lo guardamos en una variable
-            const newSocialNetworks = await db.SocialNetwork.create(socialNetworksFields);
+            // si no viene el id del aspirante retornamos un error
+            if (!candidate_id) throw new Error('ID del aspirante es requerido');
+
+            // creamos las redes con los campos extraidos y lo guardamos en una variable
+            const newSocialNetworks = await db.SocialNetwork.create({
+                linkedin: linkedin,
+                facebook: facebook,
+                twitter: twitter,
+                instagram: instagram,
+                candidate_id: candidate_id
+            });
 
             // retornamos la variable como promesa resuelta
-            return resolve(newSocialNetworks);
+            return resolve(newSocialNetworks.dataValues);
 
         } catch (error) {
             // en caso de error retornamos la variable como promesa rechazada
-            return reject(error);
+            return reject('Error al crear las redes sociales: ' + error.message);
+        }
+    })
+}
+
+socialNetworkService.update = async (object) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // extraemos los campos del objeto con desestructuración
+            const { socialNetworks = {}, candidate_id } = object;
+            const { linkedin, facebook, twitter, instagram } = socialNetworks;
+
+            // si no viene el id del aspirante retornamos un error
+            if (!candidate_id) throw new Error('ID del aspirante es requerido');
+
+            let fieldsToUpdate = { candidate_id: candidate_id };
+            if (linkedin && linkedin !== '') fieldsToUpdate.linkedin = linkedin;
+            if (facebook) fieldsToUpdate.facebook = facebook;
+            if (twitter) fieldsToUpdate.twitter = twitter;
+            if (instagram) fieldsToUpdate.instagram = instagram;
+
+            // actualizamos las redes con los campos extraidos y lo guardamos en una variable
+            await db.SocialNetwork.update(fieldsToUpdate,
+                { where: { candidate_id: candidate_id } }
+            );
+
+            // retornamos la variable como promesa resuelta
+            return resolve(true);
+
+        } catch (error) {
+            // en caso de error retornamos como promesa rechazada
+            return reject('Error al actualizar las redes sociales: ' + error.message);
         }
     })
 }

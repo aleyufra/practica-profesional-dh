@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const candidatesController = require('../controllers/candidates.controller.js');
-const { createValidation } = require('../validations/candidates.validation');
+const { createValidation, updateValidation } = require('../validations/candidates.validation');
 
 const router = Router();
 
@@ -14,7 +14,7 @@ router.get('/:id', candidatesController.detail);
 router.post('/create', createValidation, candidatesController.create);
 
 // Actualizar un candidato
-router.patch('/update/:id', candidatesController.update);
+router.patch('/update/:id', updateValidation, candidatesController.update);
 
 
 module.exports = router;
