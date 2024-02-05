@@ -5,12 +5,14 @@ const createValidation = [
     body('name')
         .notEmpty().withMessage('El nombre es requerido')
         .isString().withMessage('El nombre debe ser una cadena de texto')
+        .trim()
         .isLength({ min: 2 }).withMessage('El nombre debe ser de al menos 2 caracteres')
         .isLength({ max: 50 }).withMessage('El nombre debe ser de maximo 50 caracteres'),
 
     body('surname')
         .notEmpty().withMessage('El apellido es requerido')
         .isString().withMessage('El apellido debe ser una cadena de texto')
+        .trim()
         .isLength({ min: 2 }).withMessage('El apellido debe ser de al menos 2 caracteres')
         .isLength({ max: 50 }).withMessage('El apellido debe ser de maximo 50 caracteres'),
 
@@ -35,8 +37,7 @@ const createValidation = [
 
     body('phone')
         .optional({ nullable: true })
-        .isNumeric().withMessage('El dni debe ser un numérico')
-        .trim(),
+        .isNumeric().withMessage('El dni debe ser un numérico'),
 
     body('birthday')
         .notEmpty().withMessage('La fecha es requerida'),
@@ -69,8 +70,9 @@ const createValidation = [
 
     body('socialNetworks.facebook')
         .optional()
-        .isString().withMessage('El enlace de Facebook debe ser una cadena de texto')
-        .trim(),
+        .isString().withMessage('El nombre de Facebook debe ser una cadena de texto')
+        .trim()
+        .isLength({ min: 6 }).withMessage('El nombre de facebook debe ser de al menos 6 caracteres'),
 
     // Middleware para la validacion de los campos y transformacion de algunos datos
     (req, res, next) => {
@@ -107,8 +109,7 @@ const updateValidation = [
     body('dni')
         .optional()
         .notEmpty().withMessage('El dni es requerido')
-        .isNumeric().withMessage('El dni debe ser un numérico')
-        .trim(),
+        .isNumeric().withMessage('El dni debe ser un numérico'),
 
     body('email')
         .optional()
@@ -128,8 +129,7 @@ const updateValidation = [
 
     body('phone')
         .optional({ nullable: true })
-        .isNumeric().withMessage('El dni debe ser un numérico')
-        .trim(),
+        .isNumeric().withMessage('El dni debe ser un numérico'),
 
     body('birthday')
         .optional()
