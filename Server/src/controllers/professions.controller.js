@@ -1,64 +1,68 @@
 const db = require('../database/models');
 const Op = db.Sequelize.Op;
+const paginationHelper = require('../utils/paginationHelper.function.js');
+const candidateService = require('../services/candidate.service.js');
+const professionService = require('../services/profession.service.js');
+
 const professionsController = {};
 
+/**
+ * Listar todas las profesiones de la base de datos
+ * Con paginación y filtrado por profesión, nombre, apellido o genero
+ * @param {*} req Objeto con los query params
+ * @param {*} res Objeto con la respuesta
+ */
 professionsController.list = async (req, res) => {
     try {
-        console.log('query', req.query);
         // extraemos los query params de la url con desestructuración
-        // en caso de que no exista el query params devolverá un objeto vacío
-        const {
-            page = 1,
-            profession = '',
-            name = '',
-            surname = '',
-            gender = '',
-        } = req.query;
+        const { page = 1 } = req.query;
 
         // limite de profesiones por página
         const limit = 4;
 
+        // creamos un objeto con los query params para la condición where
+        const { candidateConditions } = candidateService.whereConditions(req.query);
+        const { professionConditions } = professionService.whereConditions(req.query);
+
         // calculamos el total de profesiones
-        const { count } = await db.Profession.findAndCountAll();
+        const { rows } = await db.Profession.findAndCountAll({
+            where: professionConditions,
+            include: [
+                { association: "candidate", where: candidateConditions },
+            ],
+        });
 
-        // calculamos el total de páginas
-        const totalPages = Math.ceil(count / limit);
+        // Resultados de los profesiones encontrados
+        const results = rows.length;
 
-        // calculamos el número de página
-        let pageNumber = 1;
-        pageNumber = page === '' ? 1 : parseInt(page);
-        pageNumber = pageNumber < 1 ? 1 : pageNumber;
-        pageNumber = pageNumber > totalPages ? totalPages : pageNumber;
-
-        // calculamos el offset
-        const offset = limit * (pageNumber - 1);
-
-        // asignamos el numero de pagina actual
-        const currentPage = pageNumber;
+        // calculamos el total de páginas, pagina actual y offset
+        const { totalPages, currentPage, offset } = paginationHelper(page, limit, results);
 
         // filtramos las profesiones con las query params proporcionados
         const foundProfessions = await db.Profession.findAll({
-            where: {
-                profession: { [Op.like]: `%${profession}%` }
-            },
-            include: [{
-                association: "candidate",
-                where: {
-                    name: { [Op.like]: `%${name}%` },
-                    surname: { [Op.like]: `%${surname}%` },
-                    gender: { [Op.like]: `%${gender}%` }
-                },
-                attributes: ['id', 'name', 'surname']
-            }],
+            where: professionConditions,
+            include: [
+                {
+                    association: "candidate",
+                    where: candidateConditions,
+                    attributes: ['id', 'name', 'surname'],
+                    include: [
+                        {
+                            association: "social_networks",
+                            attributes: ['linkedin']
+                        }
+                    ]
+                }
+            ],
             limit: limit,
             offset: offset
         });
 
-        // retornamos las profesiones
+        // retornamos un status de 200 con las profesiones
         return res.status(200).json({
             status: 200,
-            message: 'List of professions',
-            total: count,
+            message: 'Lista de profesiones',
+            results: results,
             totalPages: totalPages,
             currentPage: currentPage,
             data: foundProfessions,
