@@ -54,11 +54,13 @@ candidatesController.list = async (req, res) => {
 
         // retornamos las profesiones
         return res.status(200).json({
-            status: 200,
-            message: 'Lista de aspirantes',
-            results: results,
-            totalPages: totalPages,
-            currentPage: currentPage,
+            meta: {
+                status: 200,
+                message: 'Lista de aspirantes',
+                results: results,
+                totalPages: totalPages,
+                currentPage: currentPage
+            },
             data: foundCandidates,
         })
 
@@ -66,9 +68,12 @@ candidatesController.list = async (req, res) => {
         // En caso de error
         console.log(error);
         return res.status(500).json({
-            status: 500,
-            message: 'Error interno del servidor',
-            error: error.message
+            meta: {
+                status: 500,
+                message: 'Error interno del servidor',
+                error: error.message
+            },
+            data: []
         });
     }
 };
@@ -86,28 +91,36 @@ candidatesController.detail = async (req, res) => {
             include: [{ association: 'professions' }, { association: 'social_networks' }]
         });
 
+        // En caso de que no exista
         if (candidateFound === null) {
-            // En caso de que no exista
             return res.status(404).json({
-                status: 404,
-                message: 'Aspirante no encontrado',
+                meta: {
+                    status: 404,
+                    message: 'Aspirante no encontrado'
+                },
                 data: []
             })
-        } else {
-            // En caso de que exista
-            return res.status(200).json({
-                status: 200,
-                message: 'Aspirante encontrado',
-                data: candidateFound
-            })
         }
+
+        // En caso de que si exista
+        return res.status(200).json({
+            meta: {
+                status: 200,
+                message: 'Aspirante encontrado'
+            },
+            data: candidateFound
+        })
+
     } catch (error) {
         // En caso de error
         console.log(error);
         return res.status(500).json({
-            status: 500,
-            message: 'Error interno del servidor',
-            error: error.message
+            meta: {
+                status: 500,
+                message: 'Error interno del servidor',
+                error: error.message
+            },
+            data: []
         });
     }
 }
@@ -159,8 +172,10 @@ candidatesController.create = async (req, res) => {
 
         // Retornamos la response 201 creado
         return res.status(201).json({
-            status: 201,
-            message: 'Aspirante creado',
+            meta: {
+                status: 201,
+                message: 'Aspirante creado'
+            },
             data: candidateFound
         });
 
@@ -168,9 +183,12 @@ candidatesController.create = async (req, res) => {
         // En caso de error
         console.log(error);
         return res.status(500).json({
-            status: 500,
-            message: 'Error interno del servidor',
-            error: error.message
+            meta: {
+                status: 500,
+                message: 'Error interno del servidor',
+                error: error.message
+            },
+            data: []
         });
     }
 }
@@ -183,19 +201,7 @@ candidatesController.create = async (req, res) => {
  */
 candidatesController.update = async (req, res) => {
     // Creamos constantes de los campos que vamos a actualizar
-    const {
-        dni = null,
-        name = null,
-        surname = null,
-        email = null,
-        phone = null,
-        birthday = null,
-        gender = null,
-        image = null,
-        professions = [],
-        socialNetworks = {}
-    } = req.body;
-    console.log('body en controller', req.body);
+    const { dni, name, surname, email, phone, birthday, gender, image, professions, socialNetworks } = req.body;
 
     try {
         // Verificamos si el Aspirante existe
@@ -205,8 +211,10 @@ candidatesController.update = async (req, res) => {
         // Si no existe retornamos la response 404 no encontrado
         if (candidateExists === null) {
             return res.status(404).json({
-                status: 404,
-                message: 'Aspirante no encontrado',
+                meta: {
+                    status: 404,
+                    message: 'Aspirante no encontrado'
+                },
                 data: []
             })
         }
@@ -236,17 +244,22 @@ candidatesController.update = async (req, res) => {
 
         // Retornamos la response 200 y el Aspirante actualizado
         return res.status(200).json({
-            status: 200,
-            message: 'Aspirante actualizado',
+            meta: {
+                status: 200,
+                message: 'Aspirante actualizado'
+            },
             data: candidateFound
         })
     } catch (error) {
         // En caso de error
         console.log(error);
         return res.status(500).json({
-            status: 500,
-            message: 'Error interno del servidor',
-            error: error.message
+            meta: {
+                status: 500,
+                message: 'Error interno del servidor',
+                error: error.message
+            },
+            data: []
         });
     }
 }
@@ -268,8 +281,10 @@ candidatesController.delete = async (req, res) => {
         // En caso de que no exista retornamos la response 404 no encontrado
         if (candidateFound === null) {
             return res.status(404).json({
-                status: 404,
-                message: 'Aspirante no encontrado',
+                meta: {
+                    status: 404,
+                    message: 'Aspirante no encontrado'
+                },
                 data: []
             })
         }
@@ -283,8 +298,10 @@ candidatesController.delete = async (req, res) => {
 
         // Retornamos la response 200 y el aspirante eliminado
         return res.status(200).json({
-            status: 200,
-            message: 'Aspirante eliminado',
+            meta: {
+                status: 200,
+                message: 'Aspirante eliminado'
+            },
             data: candidateFound
         })
 
@@ -292,9 +309,12 @@ candidatesController.delete = async (req, res) => {
         // En caso de error
         console.log(error);
         return res.status(500).json({
-            status: 500,
-            message: 'Error interno del servidor',
-            error: error.message
+            meta: {
+                status: 500,
+                message: 'Error interno del servidor',
+                error: error.message
+            },
+            data: []
         });
     }
 }

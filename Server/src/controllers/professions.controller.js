@@ -17,9 +17,6 @@ professionsController.list = async (req, res) => {
         // extraemos los query params de la url con desestructuración
         const { page = 1 } = req.query;
 
-        // limite de profesiones por página
-        const limit = 4;
-
         // creamos un objeto con los query params para la condición where
         const { candidateConditions } = candidateService.whereConditions(req.query);
         const { professionConditions } = professionService.whereConditions(req.query);
@@ -31,6 +28,9 @@ professionsController.list = async (req, res) => {
                 { association: "candidate", where: candidateConditions },
             ],
         });
+
+        // limite de profesiones por página
+        const limit = 4;
 
         // Resultados de los profesiones encontrados
         const results = rows.length;
@@ -60,20 +60,25 @@ professionsController.list = async (req, res) => {
 
         // retornamos un status de 200 con las profesiones
         return res.status(200).json({
-            status: 200,
-            message: 'Lista de profesiones',
-            results: results,
-            totalPages: totalPages,
-            currentPage: currentPage,
+            meta: {
+                status: 200,
+                message: 'Lista de profesiones',
+                results: results,
+                totalPages: totalPages,
+                currentPage: currentPage
+            },
             data: foundProfessions,
         })
 
     } catch (error) {
         console.error(error);
         return res.status(500).json({
-            status: 500,
-            message: 'Error interno del servidor',
-            error: error.message
+            meta: {
+                status: 500,
+                message: "Error interno del servidor",
+                error: error.message
+            },
+            data: []
         })
     }
 }

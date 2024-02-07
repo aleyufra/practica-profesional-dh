@@ -44,7 +44,7 @@ professionService.update = async (object) => {
     return new Promise(async (resolve, reject) => {
         try {
             // extraemos los campos del objeto con desestructuración
-            const { professions, candidate_id } = object;
+            const { professions = [], candidate_id } = object;
 
             // creamos un array de objetod de aspirantes con los campos extraidos
             const professionsArray = professions.map((p) => {

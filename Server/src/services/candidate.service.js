@@ -12,13 +12,14 @@ candidateService.create = async (object) => {
     return new Promise(async (resolve, reject) => {
         try {
             // extraemos los campos del objeto con desestructuración
-            const { name, surname, dni, email, phone, birthday, gender, image } = object;
+            let { name, surname, dni, email, phone, birthday, gender, image } = object;
+            if (!phone) phone = null;
 
             // creamos el candidato con los campos extraidos y lo guardamos en una variable
             const newCandidate = await db.Candidate.create({
                 name,
                 surname,
-                dni,
+                dni: dni.toString(),
                 email,
                 phone,
                 birthday,
@@ -49,7 +50,7 @@ candidateService.update = async (object) => {
 
             // creamos un objeto con los campos que se hayan proporcionado
             let updateFields = {};
-            if (dni) updateFields.dni = dni;
+            if (dni) updateFields.dni = dni.toString();
             if (name) updateFields.name = name;
             if (surname) updateFields.surname = surname;
             if (email) updateFields.email = email;

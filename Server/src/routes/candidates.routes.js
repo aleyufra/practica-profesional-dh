@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const candidatesController = require('../controllers/candidates.controller.js');
-const { createValidation, updateValidation } = require('../validations/candidates.validation');
+const { createValidation, updateValidation } = require('../validations/candidates.validation.js');
 
 const router = Router();
 

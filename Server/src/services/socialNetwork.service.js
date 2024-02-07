@@ -50,11 +50,18 @@ socialNetworkService.update = async (object) => {
             // si no viene el id del aspirante retornamos un error
             if (!candidate_id) throw new Error('ID del aspirante es requerido');
 
+            // creamos un objeto con los campos que se hayan proporcionado
             let fieldsToUpdate = { candidate_id: candidate_id };
             if (linkedin && linkedin !== '') fieldsToUpdate.linkedin = linkedin;
+
             if (facebook) fieldsToUpdate.facebook = facebook;
+            if (facebook === '') fieldsToUpdate.facebook = null;
+
             if (twitter) fieldsToUpdate.twitter = twitter;
+            if (twitter === '') fieldsToUpdate.twitter = null;
+            
             if (instagram) fieldsToUpdate.instagram = instagram;
+            if (instagram === '') fieldsToUpdate.instagram = null;
 
             // actualizamos las redes con los campos extraidos y lo guardamos en una variable
             await db.SocialNetwork.update(fieldsToUpdate,
