@@ -17,6 +17,7 @@ candidatesController.list = async (req, res) => {
     try {
         // extraemos los query params de la url con desestructuración
         const { page = 1 } = req.query;
+        console.log('req.file', req.file);
 
         // creamos un objeto con los query params para la condición where
         const { candidateConditions } = candidateService.whereConditions(req.query);
