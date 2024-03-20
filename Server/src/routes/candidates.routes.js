@@ -1,7 +1,10 @@
-const { Router } = require('express');
-const candidatesController = require('../controllers/candidates.controller.js');
-const { createValidation, updateValidation } = require('../validations/candidates.validation.js');
-const multer = require('multer');
+const { Router } = require("express");
+const multer = require("multer");
+const candidatesController = require("../controllers/candidates.controller.js");
+const {
+	createValidation,
+	updateValidation,
+} = require("../validations/candidates.validation.js");
 
 const router = Router();
 
@@ -22,19 +25,23 @@ const router = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get('/', candidatesController.list);
+router.get("/", candidatesController.list);
 
 // Detalle de un candidato
-router.get('/:id', candidatesController.detail);
+router.get("/:id", candidatesController.detail);
 
 // Crear un nuevo candidato
-router.post('/create', upload.single('image'), createValidation, candidatesController.create);
+router.post(
+	"/create",
+	upload.single("image"),
+	createValidation,
+	candidatesController.create
+);
 
 // Actualizar un candidato
-router.patch('/update/:id', updateValidation, candidatesController.update);
+router.patch("/update/:id", updateValidation, candidatesController.update);
 
 // Eliminar un candidato
-router.delete('/delete/:id', candidatesController.delete);
-
+router.delete("/delete/:id", candidatesController.delete);
 
 module.exports = router;

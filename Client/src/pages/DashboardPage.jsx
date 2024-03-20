@@ -1,13 +1,30 @@
-import { useState, useEffect } from 'react';
-import '../../public/css/DashboardPage.css';
-import CandidatesGrid from '../components/CandidatesGrid.jsx';
+import '../../public/css/DashboardPage.css'
+import { Outlet, useLocation } from 'react-router-dom'
+import DashboardBanner from '../components/DashboardBanner'
+import DashboardAside from '../components/DashboardAside'
+import { useEffect } from 'react';
 
 function DashboardPage() {
-	
+	const location = useLocation();
+
+	const routesWithBanner = [
+		'/candidates',
+		'/candidates/:id',
+		'/professions',
+	];
+	const renderBanner = routesWithBanner.includes(location.pathname);
+
 	return (
-		<main className='mx-auto border border-gray-400 max-w-7xl'>
-			<h1>Aspirantes: </h1>
-			<CandidatesGrid />
+		<main className='bbg-white dark:bg-dark-primary min-h-max'>
+			<div className='mx-auto max-w-7xl md:px-10 xl:px-5 2xl:px-0'>
+				<div className='flex flex-col md:flex-row'>
+					<DashboardAside />
+					<div className='flex flex-col md:w-3/4'>
+						{renderBanner ? <DashboardBanner /> : null}
+						<Outlet />
+					</div>
+				</div>
+			</div >
 		</main>
 	)
 }

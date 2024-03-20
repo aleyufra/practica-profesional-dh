@@ -1,7 +1,9 @@
 import { candidateInstance } from './axios';
 const axios = candidateInstance;
 
-export const getCandidatesRequest = async (page) => axios.get('/', { params: { page } });
+export const getCandidatesRequest = async (params) => axios.get('/', {
+    params: params
+});
 
 export const getCandidateRequest = async (id) => axios.get(`/${id}`);
 

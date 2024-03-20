@@ -5,6 +5,7 @@ const corsOptions = require('./middlewares/corsOptions.js');
 
 const app = express();
 app.disabled('x-powered-by');
+require('dotenv').config({ path: './.env' });
 
 // Middlewares
 app.use(express.json());
